@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple markers</title>
+    <style>
+    html,
+    body {
+        height: 80%;
+        margin: 0;
+        padding: 0;
+    }
+    #map {
+        height: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="debugMsg"></div>
+    <script>
+    var myLatLng = {
+        lat: 25.163,
+        lng: 121.393
+    };
+
+
+    var curZoom = 11;
+    var map;
+    var marker;
+    var shift = 0.02;
+    var m_movBndLng = 0.4;
+
+
+    var m_movBndLatUp = 0.1;
+    var m_movBndLatDown = 0.1;
+
+    var m_msg;
+
+
+    var crlf = '<P>';
+
+    // taipei
+    var loca_taipei = {
+        lat: 25.163,
+        lng: 121.393
+    };
+
+    // taipei
+    var loca_HK = {
+        lat: 22.283,
+        lng: 114.173
+    };
+
+    var loca_PH = {
+        lat: 23.563,
+        lng: 119.573
+    };
+
+
+
+
+    function makePort() {
+        var taipei = new google.maps.Marker({
+            position: loca_taipei,
+            map: map,
+            label: 'Taipei',
+            title: 'Taipei'
+        });
+
+        var taipei = new google.maps.Marker({
+            position: loca_HK,
+            map: map,
+            label: 'HK',
+            title: 'HK'
+        });
+
+        var ph = new google.maps.Marker({
+            position: loca_PH,
+            map: map,
+            label: 'PH',
+            title: 'PH'
+        });
+
+    }
+
+    function initMap() {
+        //var originalMapCenter = new google.maps.LatLng(-25.363882, 131.044922);
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: curZoom,
+            center: myLatLng,
+            keyboardShortcuts: false,
+            mapTypeId: google.maps.MapTypeId.HYBRID
+        });
+
+        map.addListener('zoom_changed', function() {
+            //curZoom = map.getZoom();
+            //alert(curZoom);
+        });
+
+        marker = new google.maps.Marker({
+            position: myLatLng,
+            map: map,
+            title: 'Hello World!'
+        });
+        makePort();
+    }
+
+    function getOffsetLng(dist) {
+        var offset = 0;
+        if (dist < 0) {
+            if ((dist * (-1)) > m_movBndLng) {
+                offset = dist + m_movBndLng;
+            }
+        } else {
+            //right
+            if (dist > m_movBndLng) {
+                offset = dist - m_movBndLng;
+            }
+        }
+        return offset;
+    }
+
+    function adjustLng() {
+    	var cLatLng = map.getCenter();
+    	var dist = myLatLng.lng - cLatLng.lng();
+        var offset = getOffsetLng(dist);
+        map.setCenter({
+            lat: cLatLng.lat(),
+            lng: cLatLng.lng() + offset
+        });   
+    }
+
+
+    function getOffsetLat(dist) {
+        var offset = 0;
+        if (dist < 0) {
+            if ((dist * (-1)) > m_movBndLatDown) {
+                offset = dist + m_movBndLatDown;
+            }
+        } else {
+            //up
+            if (dist > m_movBndLatUp) {
+                offset = dist - m_movBndLatUp;
+            }
+        }
+        return offset;
+    }
+
+    function adjustLat() {
+    	var cLatLng = map.getCenter();
+    	var dist = myLatLng.lat - cLatLng.lat();
+        var offset = getOffsetLat(dist);
+        map.setCenter({
+            lat: cLatLng.lat() + offset ,
+            lng: cLatLng.lng() 
+        });   
+    }
+
+
+    function moveMarker() {
+        var keycode = event.which || event.keyCode;
+        var newZoom = curZoom;
+
+        if (keycode == 37) {
+            myLatLng.lng = myLatLng.lng - shift;
+        }
+        if (keycode == 38) {
+            myLatLng.lat = myLatLng.lat + shift;
+        }
+        if (keycode == 39) {
+            myLatLng.lng = myLatLng.lng + shift;
+        }
+        if (keycode == 40) {
+            myLatLng.lat = myLatLng.lat - shift;
+        }
+
+        marker.setPosition(myLatLng);
+
+
+        adjustLng();
+        adjustLat();
+        showDebugMsg();
+    }
+
+    function showMarker() {
+        showDebugMsg();
+    }
+
+    function showDebugMsg() {
+        var debug = document.getElementById('debugMsg');
+        var cLatLng = map.getCenter();
+    	var dist = myLatLng.lat - cLatLng.lat();
+        var msg = 'lat' + myLatLng.lat + ', lng:' + myLatLng.lng;
+        msg += crlf + 'curZoom =' + curZoom;
+        msg += crlf + 'Center =' + cLatLng;
+        msg += crlf + 'dist =' + dist;
+
+     
+        debug.innerHTML = msg;
+    }
+
+    document.onkeydown = moveMarker;
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvrWMt9aG8Os4oXdj3jBWwl2VSl6dBZ8Y&signed_in=true&callback=initMap"></script>
+    <button onclick="showMarker()">showMarker</button>
+</body>
+
+</html>
