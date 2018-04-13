@@ -1,0 +1,4 @@
+
+HOW TO add random markers to a map BUT avoiding the sea?
+
+https://stackoverflow.com/questions/990148/how-to-add-random-markers-to-a-map-but-avoiding-the-sea
